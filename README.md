@@ -1,4 +1,4 @@
-<img src="https://github.com/mytechnotalent/IoT/blob/main/IoT.png?raw=true" width="400">
+<img src="https://github.com/mytechnotalent/STM32F4_SSD1306_Driver/blob/main/STM32F4_SSD1306_Driver.png?raw=true">
 
 ## FREE Reverse Engineering Self-Study Course [HERE](https://github.com/mytechnotalent/Reverse-Engineering-Tutorial)
 
