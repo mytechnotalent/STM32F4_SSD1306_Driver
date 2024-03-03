@@ -871,4 +871,4 @@ SPACE:
 <br>
 
 ## License
-[MIT](https://raw.githubusercontent.com/mytechnotalent/STM32F4_SSD1306/main/LICENSE)
+[MIT](https://raw.githubusercontent.com/mytechnotalent/STM32F4_SSD1306_Driver/main/LICENSE)
