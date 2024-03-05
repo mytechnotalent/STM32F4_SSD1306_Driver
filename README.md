@@ -19,7 +19,7 @@ An STM32F4, SSD1306 display driver written entirely in Assembler.
  *
  * AUTHOR: Kevin Thomas
  * CREATION DATE: March 3, 2024
- * UPDATE DATE: March 4, 2024
+ * UPDATE DATE: March 5, 2024
  *
  * ASSEMBLE AND LINK w/ SYMBOLS:
  * 1. arm-none-eabi-as -g main.s -o main.o
