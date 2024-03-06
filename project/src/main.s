@@ -80,7 +80,7 @@
 
 /**
  * Initialize the .isr_vector section.
- * The .isr_vectorsection contains vector table.
+ * The .isr_vector section contains vector table.
  */
 .section .isr_vector, "a"
 
