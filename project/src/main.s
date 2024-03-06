@@ -10,11 +10,11 @@
  *
  * ASSEMBLE AND LINK w/ SYMBOLS:
  * 1. arm-none-eabi-as -g main.s -o main.o
- * 2. arm-none-eabi-ld main.o -o main.elf -T stm32f401ccux.ld
+ * 2. arm-none-eabi-ld main.o -o main.elf -T STM32F401CCUX_FLASH.ld
  * 3. openocd -f interface/stlink-v2.cfg -f target/stm32f4x.cfg -c "program main.elf verify reset exit"
  * ASSEMBLE AND LINK w/o SYMBOLS:
  * 1. arm-none-eabi-as -g main.s -o main.o
- * 2. arm-none-eabi-ld main.o -o main.elf -T stm32f401ccux.ld
+ * 2. arm-none-eabi-ld main.o -o main.elf -T STM32F401CCUX_FLASH.ld
  * 3. arm-none-eabi-objcopy -O binary --strip-all main.elf main.bin
  * 3. openocd -f interface/stlink-v2.cfg -f target/stm32f4x.cfg -c "program main.bin 0x08000000 verify reset exit"
  * DEBUG w/ SYMBOLS:
@@ -31,16 +31,12 @@
  * 5. x/8i $pc
  */
 
+
 .syntax unified
 .cpu cortex-m4
 .fpu softvfp
 .thumb
 
-/**
- * The start address for the initialization values of the .data section
- * defined in linker script.
- */
-.word _sidata
 
 /**
  * The start address for the .data section defined in linker script.
@@ -53,6 +49,12 @@
 .word _edata
 
 /**
+ * The start address for the initialization values of the .data section
+ * defined in linker script.
+ */
+.word _sidata
+
+/**
  * The start address for the .bss section defined in linker script.
  */
 .word _sbss
@@ -61,6 +63,7 @@
  * The end address for the .bss section defined in linker script.
  */
 .word _ebss
+
 
 /**
  * Provide weak aliases for each Exception handler to the Default_Handler.
@@ -74,13 +77,19 @@
   .word \name
 .endm
 
+
+/**
+ * Initialize the .isr_vector section.
+ * The .isr_vectorsection contains vector table.
+ */
+.section .isr_vector, "a"
+
 /**
  * The STM32F401CCUx vector table.  Note that the proper constructs
  * must be placed on this to ensure that it ends up at physical address
  * 0x0000.0000.
  */
 .global isr_vector
-.section .isr_vector, "a"
 .type isr_vector, %object
 isr_vector:
   .word _estack
@@ -205,25 +214,25 @@ Reset_Handler:
   LDR   R1, =_edata                                        // copy the data segment initializers from flash to SRAM
   LDR   R2, =_sidata                                       // copy the data segment initializers from flash to SRAM
   MOVS  R3, #0                                             // copy the data segment initializers from flash to SRAM
-  B     .Reset_Handler_LoopCopyDataInit                    // branch
-.Reset_Handler_CopyDataInit:
+  B     .Reset_Handler_Loop_Copy_Data_Init                 // branch
+.Reset_Handler_Copy_Data_Init:
   LDR   R4, [R2, R3]                                       // copy the data segment initializers into registers
   STR   R4, [R0, R3]                                       // copy the data segment initializers into registers
   ADDS  R3, R3, #4                                         // copy the data segment initializers into registers
-.Reset_Handler_LoopCopyDataInit:
+.Reset_Handler_Loop_Copy_Data_Init:
   ADDS  R4, R0, R3                                         // initialize the data segment
   CMP   R4, R1                                             // initialize the data segment
-  BCC   .Reset_Handler_CopyDataInit                        // branch if carry is clear
+  BCC   .Reset_Handler_Copy_Data_Init                      // branch if carry is clear
   LDR   R2, =_sbss                                         // copy the bss segment initializers from flash to SRAM
   LDR   R4, =_ebss                                         // copy the bss segment initializers from flash to SRAM
   MOVS  R3, #0                                             // copy the bss segment initializers from flash to SRAM
-  B     .Reset_Handler_LoopFillZeroBSS                     // branch
-.Reset_Handler_FillZeroBSS:
+  B     .Reset_Handler_Loop_Fill_Zero_BSS                  // branch
+.Reset_Handler_Fill_Zero_BSS:
   STR   R3, [R2]                                           // zero fill the bss segment
   ADDS  R2, R2, #4                                         // zero fill the bss segment
-.Reset_Handler_LoopFillZeroBSS:
+.Reset_Handler_Loop_Fill_Zero_BSS:
   CMP   R2, R4                                             // zero fill the bss segment
-  BCC   .Reset_Handler_FillZeroBSS                         // branch if carry is clear
+  BCC   .Reset_Handler_Fill_Zero_BSS                       // branch if carry is clear
   BL    main                                               // call function
 
 /**
@@ -273,52 +282,52 @@ main:
   MOV   R0, #0x00                                          // lower col start addr
   MOV   R1, #0x11                                          // higher col start addr
   MOV   R2, #0xB0                                          // page start addr
-  LDR   R3, =H                                             // load the address of array H
+  LDR   R3, =LETTER_H                                      // load the address of array H
   BL    SSD1306_Display_Letter                             // call function
   MOV   R0, #0x00                                          // lower col start addr
   MOV   R1, #0x12                                          // higher col start addr
   MOV   R2, #0xB0                                          // page start addr
-  LDR   R3, =E                                             // load the address of array E
+  LDR   R3, =LETTER_E                                      // load the address of array E
   BL    SSD1306_Display_Letter                             // call function
   MOV   R0, #0x00                                          // lower col start addr
   MOV   R1, #0x13                                          // higher col start addr
   MOV   R2, #0xB0                                          // page start addr
-  LDR   R3, =L                                             // load the address of array L
+  LDR   R3, =LETTER_L                                      // load the address of array L
   BL    SSD1306_Display_Letter                             // call function
   MOV   R0, #0x00                                          // lower col start addr
   MOV   R1, #0x14                                          // higher col start addr
   MOV   R2, #0xB0                                          // page start addr
-  LDR   R3, =L                                             // load the address of array L
+  LDR   R3, =LETTER_L                                      // load the address of array L
   BL    SSD1306_Display_Letter                             // call function
   MOV   R0, #0x00                                          // lower col start addr
   MOV   R1, #0x15                                          // higher col start addr
   MOV   R2, #0xB0                                          // page start addr
-  LDR   R3, =O                                             // load the address of array O
+  LDR   R3, =LETTER_O                                      // load the address of array O
   BL    SSD1306_Display_Letter                             // call function
   MOV   R0, #0x00                                          // lower col start addr
   MOV   R1, #0x11                                          // higher col start addr
   MOV   R2, #0xB2                                          // page start addr
-  LDR   R3, =W                                             // load the address of array O
+  LDR   R3, =LETTER_W                                      // load the address of array O
   BL    SSD1306_Display_Letter                             // call function
   MOV   R0, #0x00                                          // lower col start addr
   MOV   R1, #0x12                                          // higher col start addr
   MOV   R2, #0xB2                                          // page start addr
-  LDR   R3, =O                                             // load the address of array O
+  LDR   R3, =LETTER_O                                      // load the address of array O
   BL    SSD1306_Display_Letter                             // call function
   MOV   R0, #0x00                                          // lower col start addr
   MOV   R1, #0x13                                          // higher col start addr
   MOV   R2, #0xB2                                          // page start addr
-  LDR   R3, =R                                             // load the address of array O
+  LDR   R3, =LETTER_R                                      // load the address of array O
   BL    SSD1306_Display_Letter                             // call function
   MOV   R0, #0x00                                          // lower col start addr
   MOV   R1, #0x14                                          // higher col start addr
   MOV   R2, #0xB2                                          // page start addr
-  LDR   R3, =L                                             // load the address of array O
+  LDR   R3, =LETTER_L                                      // load the address of array O
   BL    SSD1306_Display_Letter                             // call function
   MOV   R0, #0x00                                          // lower col start addr
   MOV   R1, #0x15                                          // higher col start addr
   MOV   R2, #0xB2                                          // page start addr
-  LDR   R3, =D                                             // load the address of array D
+  LDR   R3, =LETTER_D                                      // load the address of array D
   BL    SSD1306_Display_Letter                             // call function
   BL    SSD1306_Turn_On_Display                            // call function
   BL    Loop                                               // call function
@@ -661,14 +670,14 @@ SSD1306_Clear_Screen:
   MOV   R1, #0x10                                          // higher col start addr
   MOV   R2, #0xB0                                          // page start addr
   BL    SSD1306_Set_Cursor                                 // call function
-  MOV   R12, #0x00                                         // set counter
+  MOV   R11, #0x00                                         // set counter
 .SSD1306_Clear_Screen_Loop:
   MOV   R0, #0x3C                                          // SSD1306 I2C addr
   MOV   R1, #0x40                                          // data mode
   MOV   R2, #0                                             // data
   BL    I2C_Write_Byte                                     // call function
-  ADD   R12, #0x1                                          // increment counter
-  CMP   R12, #0x480                                        // cmp if 0x480
+  ADD   R11, #0x1                                          // increment counter
+  CMP   R11, #0x480                                        // cmp if 0x480
   BNE   .SSD1306_Clear_Screen_Loop                         // branch not equal
   POP   {R4-R11, LR}                                       // pop registers R4-R11, LR from the stack
   BX    LR                                                 // return to caller
@@ -792,68 +801,71 @@ I2C_Write_Byte:
 Loop:
   B     .                                                  // branch infinite loop
 
+/**
+ * Initialize the .rodata section.
+ * The .rodata section is used for constants and static strings.
+ */
+.section .rodata
+LETTER_A:
+  .byte 0xC0, 0x00, 0x38, 0x00, 0x26, 0x00, 0x38, 0x00, 0xC0, 0x00, 0x00, 0x00
+LETTER_B:
+  .byte 0x00, 0x00, 0xFE, 0x00, 0x92, 0x00, 0x92, 0x00, 0x92, 0x00, 0x6C, 0x00
+LETTER_C:
+  .byte 0x7C, 0x00, 0x82, 0x00, 0x82, 0x00, 0x82, 0x00, 0x64, 0x00, 0x00, 0x00
+LETTER_D:
+  .byte 0x00, 0x00, 0xFE, 0x00, 0x82, 0x00, 0x82, 0x00, 0x82, 0x00, 0x7C, 0x00
+LETTER_E:
+  .byte 0x00, 0x00, 0xFE, 0x00, 0x92, 0x00, 0x92, 0x00, 0x92, 0x00, 0x00, 0x00
+LETTER_F:
+  .byte 0x00, 0x00, 0xFE, 0x00, 0x12, 0x00, 0x12, 0x00, 0x12, 0x00, 0x00, 0x00
+LETTER_G:
+  .byte 0x7C, 0x00, 0x82, 0x00, 0x82, 0x00, 0x92, 0x00, 0x74, 0x00, 0x00, 0x00
+LETTER_H:
+  .byte 0x00, 0x00, 0xFE, 0x00, 0x10, 0x00, 0x10, 0x00, 0x10, 0x00, 0xFE, 0x00
+LETTER_I:
+  .byte 0x00, 0x00, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+LETTER_J:
+  .byte 0x40, 0x00, 0x80, 0x00, 0x80, 0x00, 0x7E, 0x00, 0x00, 0x00, 0x00, 0x00
+LETTER_K:
+  .byte 0x00, 0x00, 0xFE, 0x00, 0x10, 0x00, 0x18, 0x00, 0x64, 0x00, 0x82, 0x00
+LETTER_L:
+  .byte 0x00, 0x00, 0xFE, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x00, 0x00
+LETTER_M:
+  .byte 0x00, 0x00, 0xFE, 0x00, 0x18, 0x00, 0xF0, 0x00, 0x18, 0x00, 0xFE, 0x00
+LETTER_N:
+  .byte 0x00, 0x00, 0xFE, 0x00, 0x0C, 0x00, 0x38, 0x00, 0x60, 0x00, 0xFE, 0x00
+LETTER_O:
+  .byte 0x7C, 0x00, 0xC6, 0x00, 0x82, 0x00, 0x82, 0x00, 0xC2, 0x00, 0x7C, 0x00
+LETTER_P:
+  .byte 0x00, 0x00, 0xFE, 0x00, 0x12, 0x00, 0x12, 0x00, 0x12, 0x00, 0x0C, 0x00
+LETTER_Q:
+  .byte 0x7C, 0x00, 0xC6, 0x00, 0x82, 0x00, 0x82, 0x00, 0xC6, 0x00, 0xFC, 0x01
+LETTER_R:
+  .byte 0x00, 0x00, 0xFE, 0x00, 0x12, 0x00, 0x12, 0x00, 0x72, 0x00, 0x8E, 0x00
+LETTER_S:
+  .byte 0x00, 0x00, 0x6C, 0x00, 0xCA, 0x00, 0x92, 0x00, 0x92, 0x00, 0x74, 0x00
+LETTER_T:
+  .byte 0x02, 0x00, 0x02, 0x00, 0xFE, 0x00, 0x02, 0x00, 0x02, 0x00, 0x00, 0x00
+LETTER_U:
+  .byte 0x00, 0x00, 0x7E, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x7E, 0x00
+LETTER_V:
+  .byte 0x06, 0x00, 0x38, 0x00, 0xC0, 0x00, 0x38, 0x00, 0x06, 0x00, 0x00, 0x00
+LETTER_W:
+  .byte 0x7E, 0x00, 0xE0, 0x00, 0x30, 0x00, 0x3E, 0x00, 0x60, 0x00, 0xFE, 0x00
+LETTER_X:
+  .byte 0x82, 0x00, 0x6C, 0x00, 0x10, 0x00, 0x6C, 0x00, 0x82, 0x00, 0x00, 0x00
+LETTER_Y:
+  .byte 0x02, 0x00, 0x0C, 0x00, 0xF0, 0x00, 0x0C, 0x00, 0x02, 0x00, 0x00, 0x00
+LETTER_Z:
+  .byte 0xC2, 0x00, 0xA2, 0x00, 0x92, 0x00, 0x8A, 0x00, 0x86, 0x00, 0x00, 0x00
+LETTER_SPACE:
+  .byte 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 /**
  * Initialize the .data section.
  * The .data section is used for initialized global or static variables.
  */
 .section .data
-
-A:
-  .byte 0xC0, 0x00, 0x38, 0x00, 0x26, 0x00, 0x38, 0x00, 0xC0, 0x00, 0x00, 0x00
-B:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x92, 0x00, 0x92, 0x00, 0x92, 0x00, 0x6C, 0x00
-C:
-  .byte 0x7C, 0x00, 0x82, 0x00, 0x82, 0x00, 0x82, 0x00, 0x64, 0x00, 0x00, 0x00
-D:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x82, 0x00, 0x82, 0x00, 0x82, 0x00, 0x7C, 0x00
-E:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x92, 0x00, 0x92, 0x00, 0x92, 0x00, 0x00, 0x00
-F:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x12, 0x00, 0x12, 0x00, 0x12, 0x00, 0x00, 0x00
-G:
-  .byte 0x7C, 0x00, 0x82, 0x00, 0x82, 0x00, 0x92, 0x00, 0x74, 0x00, 0x00, 0x00
-H:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x10, 0x00, 0x10, 0x00, 0x10, 0x00, 0xFE, 0x00
-I:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-J:
-  .byte 0x40, 0x00, 0x80, 0x00, 0x80, 0x00, 0x7E, 0x00, 0x00, 0x00, 0x00, 0x00
-K:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x10, 0x00, 0x18, 0x00, 0x64, 0x00, 0x82, 0x00
-L:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x00, 0x00
-M:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x18, 0x00, 0xF0, 0x00, 0x18, 0x00, 0xFE, 0x00
-N:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x0C, 0x00, 0x38, 0x00, 0x60, 0x00, 0xFE, 0x00
-O:
-  .byte 0x7C, 0x00, 0xC6, 0x00, 0x82, 0x00, 0x82, 0x00, 0xC2, 0x00, 0x7C, 0x00
-P:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x12, 0x00, 0x12, 0x00, 0x12, 0x00, 0x0C, 0x00
-Q:
-  .byte 0x7C, 0x00, 0xC6, 0x00, 0x82, 0x00, 0x82, 0x00, 0xC6, 0x00, 0xFC, 0x01
-R:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x12, 0x00, 0x12, 0x00, 0x72, 0x00, 0x8E, 0x00
-S:
-  .byte 0x00, 0x00, 0x6C, 0x00, 0xCA, 0x00, 0x92, 0x00, 0x92, 0x00, 0x74, 0x00
-T:
-  .byte 0x02, 0x00, 0x02, 0x00, 0xFE, 0x00, 0x02, 0x00, 0x02, 0x00, 0x00, 0x00
-U:
-  .byte 0x00, 0x00, 0x7E, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x7E, 0x00
-V:
-  .byte 0x06, 0x00, 0x38, 0x00, 0xC0, 0x00, 0x38, 0x00, 0x06, 0x00, 0x00, 0x00
-W:
-  .byte 0x7E, 0x00, 0xE0, 0x00, 0x30, 0x00, 0x3E, 0x00, 0x60, 0x00, 0xFE, 0x00
-X:
-  .byte 0x82, 0x00, 0x6C, 0x00, 0x10, 0x00, 0x6C, 0x00, 0x82, 0x00, 0x00, 0x00
-Y:
-  .byte 0x02, 0x00, 0x0C, 0x00, 0xF0, 0x00, 0x0C, 0x00, 0x02, 0x00, 0x00, 0x00
-Z:
-  .byte 0xC2, 0x00, 0xA2, 0x00, 0x92, 0x00, 0x8A, 0x00, 0x86, 0x00, 0x00, 0x00
-SPACE:
-  .byte 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-
 
 /**
  * Initialize the .bss section.
