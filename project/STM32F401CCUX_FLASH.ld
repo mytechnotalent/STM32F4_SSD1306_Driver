@@ -6,7 +6,7 @@
  *
  * AUTHOR: Kevin Thomas
  * CREATION DATE: March 5, 2024
- * UPDATE Date: March 5, 2024
+ * UPDATE Date: March 6, 2024
  */
 
 
@@ -14,7 +14,7 @@
 ENTRY(Reset_Handler)
 
 /* Highest address of the user mode stack. */
-_estack = ORIGIN(RAM) + LENGTH(RAM);                       /* end of "RAM" Ram type memory */
+_estack = ORIGIN(RAM) + LENGTH(RAM);                       /* end of "RAM" RAM type memory */
 
 /* The memory definitions. */
 MEMORY
@@ -26,62 +26,43 @@ MEMORY
 /* The sections. */
 SECTIONS
 {
-  /* The startup code into "FLASH" Rom type memory. */
+  /* The startup code into "FLASH" ROM type memory. */
   .isr_vector :
   {
-    . = ALIGN(4);
-    KEEP(*(.isr_vector))                                   /* startup code */
-    . = ALIGN(4);
+    *(.isr_vector)                                         /* startup code */
   } >FLASH
 
-  /* The program code and other data into "FLASH" Rom type memory. */
+  /* The program code and other data into "FLASH" ROM type memory. */
   .text :
   {
-    . = ALIGN(4);
     *(.text)                                               /* .text sections (code) */
-    *(.text*)                                              /* .text* sections (code) */
-
-    . = ALIGN(4);
     _etext = .;                                            /* define a global symbols at end of code */
   } >FLASH
 
   /* Constant data into "FLASH" Rom type memory. */
   .rodata :
   {
-    . = ALIGN(4);
     *(.rodata)                                             /* .rodata sections (constants, strings, etc.) */
-    *(.rodata*)                                            /* .rodata* sections (constants, strings, etc.) */
-    . = ALIGN(4);
   } >FLASH
 
   /* Used by the startup to initialize data. */
   _sidata = LOADADDR(.data);
 
-  /* Initialized data sections into "RAM" Ram type memory. */
+  /* Initialized data sections into "RAM" RAM type memory. */
   .data :
   {
-    . = ALIGN(4);
     _sdata = .;                                            /* create a global symbol at data start */
     *(.data)                                               /* .data sections */
-    *(.data*)                                              /* .data* sections */
-
-    . = ALIGN(4);
     _edata = .;                                            /* define a global symbol at data end */
-
   } >RAM AT> FLASH
 
-  /* Uninitialized data section into "RAM" Ram type memory. */
-  . = ALIGN(4);
+  /* Uninitialized data section into "RAM" RAM type memory. */
   .bss :
   {
     /* This is used by the startup in order to initialize the .bss section. */
     _sbss = .;                                             /* define a global symbol at bss start */
     __bss_start__ = _sbss;
     *(.bss)
-    *(.bss*)
-    *(COMMON)
-
-    . = ALIGN(4);
     _ebss = .;                                             /* define a global symbol at bss end */
     __bss_end__ = _ebss;
   } >RAM
