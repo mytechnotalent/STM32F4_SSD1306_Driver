@@ -93,7 +93,7 @@ An STM32F4, SSD1306 display driver written entirely in Assembler.
 
 /**
  * Initialize the .isr_vector section.
- * The .isr_vectorsection contains vector table.
+ * The .isr_vector section contains vector table.
  */
 .section .isr_vector, "a"
 
