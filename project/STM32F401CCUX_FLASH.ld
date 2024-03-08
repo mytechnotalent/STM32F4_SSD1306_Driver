@@ -6,7 +6,7 @@
  *
  * AUTHOR: Kevin Thomas
  * CREATION DATE: March 5, 2024
- * UPDATE Date: March 6, 2024
+ * UPDATE Date: March 7, 2024
  */
 
 
@@ -51,9 +51,6 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  /* Used by the startup to initialize data. */
-  _sidata = LOADADDR(.data);
-
   /* Initialized data sections into "RAM" RAM type memory. */
   .data :
   {
@@ -61,6 +58,7 @@ SECTIONS
     _sdata = .;                                            /* create a global symbol at data start */
     *(.data)                                               /* .data sections */
     _edata = .;                                            /* define a global symbol at data end */
+    _sidata = LOADADDR(.data);                             /* used by the startup to initialize data */
     . = ALIGN(4);
   } >RAM AT> FLASH
 
