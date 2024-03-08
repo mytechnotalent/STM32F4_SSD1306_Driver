@@ -801,6 +801,7 @@ I2C_Write_Byte:
 Loop:
   B     .                                                  // branch infinite loop
 
+
 /**
  * Initialize the .rodata section.
  * The .rodata section is used for constants and static strings.
@@ -861,11 +862,13 @@ LETTER_Z:
 LETTER_SPACE:
   .byte 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
+
 /**
  * Initialize the .data section.
  * The .data section is used for initialized global or static variables.
  */
 .section .data
+
 
 /**
  * Initialize the .bss section.
