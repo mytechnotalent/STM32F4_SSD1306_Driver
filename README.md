@@ -19,7 +19,7 @@ An STM32F4, SSD1306 display driver written entirely in Assembler.
  *
  * AUTHOR: Kevin Thomas
  * CREATION DATE: March 3, 2024
- * UPDATE DATE: March 5, 2024
+ * UPDATE DATE: March 8, 2024
  *
  * ASSEMBLE AND LINK w/ SYMBOLS:
  * 1. arm-none-eabi-as -g main.s -o main.o
@@ -750,7 +750,7 @@ I2C_Write_Byte:
   LDR   R7, =0x40005418                                    // load address of I2C1_SR2 register
   LDR   R8, [R7]                                           // load value inside I2C1_SR2 register
   TST   R8, #(1<<1)                                        // read the BUSY bit, if 0, then BNE
-  BNE   .I2C_Wait_Not_Busy                                 // branch if equal
+  BNE   .I2C_Wait_Not_Busy                                 // branch if not equal
   LDR   R7, =0x40005400                                    // load address of I2C1_CR1 register
   LDR   R8, [R7]                                           // load value inside I2C1_CR1 register
   ORR   R8, #(1<<8)                                        // set the START bit
