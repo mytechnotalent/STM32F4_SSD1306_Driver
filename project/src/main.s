@@ -666,14 +666,14 @@ SSD1306_Clear_Screen:
   MOV   R1, #0x10                                          // higher col start addr
   MOV   R2, #0xB0                                          // page start addr
   BL    SSD1306_Set_Cursor                                 // call function
-  MOV   R11, #0x00                                         // set counter
+  MOV   R4, #0x00                                          // set counter
 .SSD1306_Clear_Screen_Loop:
   MOV   R0, #0x3C                                          // SSD1306 I2C addr
   MOV   R1, #0x40                                          // data mode
   MOV   R2, #0                                             // data
   BL    I2C_Write_Byte                                     // call function
-  ADD   R11, #0x1                                          // increment counter
-  CMP   R11, #0x480                                        // cmp if 0x480
+  ADD   R4, #0x1                                           // increment counter
+  CMP   R4, #0x480                                         // cmp if 0x480
   BNE   .SSD1306_Clear_Screen_Loop                         // branch not equal
   POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
   BX    LR                                                 // return to caller
@@ -700,14 +700,14 @@ SSD1306_Display_Letter:
   MOV   R6, R2                                             // copy third arg into R6
   MOV   R7, R3                                             // copy fourth arg into R7
   BL    SSD1306_Set_Cursor                                 // call function
-  MOV   R12, #0                                            // counter
+  MOV   R8, #0                                             // set counter
 .SSD1306_Display_Letter_Loop:
   MOV   R0, #0x3C                                          // SSD1306 I2C addr
   MOV   R1, #0x40                                          // data mode
-  LDRB  R2, [R7, R12]                                      // load  byte at addr in R8 and inc by counter
+  LDRB  R2, [R7, R8]                                       // load  byte at addr in R8 and inc by counter
   BL    I2C_Write_Byte                                     // call function
-  ADDS  R12, #1                                            // inc counter
-  CMP   R12, #6                                            // compare if end of array
+  ADDS  R8, #1                                             // inc counter
+  CMP   R8, #6                                             // compare if end of array
   BNE   .SSD1306_Display_Letter_Loop                       // branch if not equal
   POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
   BX    LR                                                 // return to caller
@@ -795,7 +795,7 @@ I2C_Write_Byte:
  */
 Thirty_Microsecond_Delay:
   PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack 
-  MOV   R4, #0x7                                           // number of loops
+  MOV   R4, #7                                             // number of loops
 .Thirty_Microsecond_Delay_Outer_Loop:
   MOV   R5, #0xFFFF                                        // set initial delay count
 .Thirty_Microsecond_Delay_Inner_Loop:
