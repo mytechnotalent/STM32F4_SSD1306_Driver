@@ -6,7 +6,7 @@
  *
  * AUTHOR: Kevin Thomas
  * CREATION DATE: March 3, 2024
- * UPDATE DATE: March 8, 2024
+ * UPDATE DATE: March 31, 2024
  *
  * ASSEMBLE AND LINK w/ SYMBOLS:
  * 1. arm-none-eabi-as -g main.s -o main.o
@@ -49,8 +49,7 @@
 .word _edata
 
 /**
- * The start address for the initialization values of the .data section
- * defined in linker script.
+ * The start address for the initialization values of the .data section defined in linker script.
  */
 .word _sidata
 
@@ -66,9 +65,8 @@
 
 
 /**
- * Provide weak aliases for each Exception handler to the Default_Handler.
- * As they are weak aliases, any function with the same name will override
- * this definition.
+ * Provide weak aliases for each Exception handler to the Default_Handler. As they are weak aliases, any function
+ * with the same name will override this definition.
  */
 .macro weak name
   .global \name
@@ -79,15 +77,13 @@
 
 
 /**
- * Initialize the .isr_vector section.
- * The .isr_vector section contains vector table.
+ * Initialize the .isr_vector section. The .isr_vector section contains vector table.
  */
 .section .isr_vector, "a"
 
 /**
- * The STM32F401CCUx vector table.  Note that the proper constructs
- * must be placed on this to ensure that it ends up at physical address
- * 0x0000.0000.
+ * The STM32F401CCUx vector table. Note that the proper constructs must be placed on this to ensure that it ends up
+ * at physical address 0x00000000.
  */
 .global isr_vector
 .type isr_vector, %object
@@ -109,9 +105,9 @@ isr_vector:
    weak PendSV_Handler
    weak SysTick_Handler
   .word 0
-   weak EXTI16_PVD_IRQHandler                              // EXTI Line 16 interrupt /PVD through EXTI line detection interrupt
+   weak EXTI16_PVD_IRQHandler                              // EXTI Line 16 interrupt PVD through EXTI line detection 
    weak TAMP_STAMP_IRQHandler                              // Tamper and TimeStamp interrupts through the EXTI line
-   weak EXTI22_RTC_WKUP_IRQHandler                         // EXTI Line 22 interrupt /RTC Wakeup interrupt through the EXTI line
+   weak EXTI22_RTC_WKUP_IRQHandler                         // EXTI Line 22 interrupt RTC Wakeup interrupt, EXTI line
    weak FLASH_IRQHandler                                   // FLASH global interrupt
    weak RCC_IRQHandler                                     // RCC global interrupt
    weak EXTI0_IRQHandler                                   // EXTI Line0 interrupt
@@ -134,7 +130,7 @@ isr_vector:
    weak EXTI9_5_IRQHandler                                 // EXTI Line[9:5] interrupts
    weak TIM1_BRK_TIM9_IRQHandle                            // TIM1 Break interrupt and TIM9 global interrupt
    weak TIM1_UP_TIM10_IRQHandler                           // TIM1 Update interrupt and TIM10 global interrupt
-   weak TIM1_TRG_COM_TIM11_IRQHandler                      // TIM1 Trigger and Commutation interrupts and TIM11 global interrupt
+   weak TIM1_TRG_COM_TIM11_IRQHandler                      // TIM1 T/C interrupts, TIM11 global interrupt
    weak TIM1_CC_IRQHandler                                 // TIM1 Capture Compare interrupt
    weak TIM2_IRQHandler                                    // TIM2 global interrupt
    weak TIM3_IRQHandler                                    // TIM3 global interrupt
@@ -149,8 +145,8 @@ isr_vector:
    weak USART2_IRQHandler                                  // USART2 global interrupt
   .word 0                                                  // reserved
    weak EXTI15_10_IRQHandler                               // EXTI Line[15:10] interrupts
-   weak EXTI17_RTC_Alarm_IRQHandler                        // EXTI Line 17 interrupt / RTC Alarms (A and B) through EXTI line interrupt
-   weak EXTI18_OTG_FS_WKUP_IRQHandler                      // EXTI Line 18 interrupt / USBUSB OTG FS Wakeup through EXTI line interrupt
+   weak EXTI17_RTC_Alarm_IRQHandler                        // EXTI Line 17 interrupt / RTC Alarms (A and B) EXTI
+   weak EXTI18_OTG_FS_WKUP_IRQHandler                      // EXTI Line 18 interrupt / USBUSB OTG FS Wakeup EXTI
   .word 0                                                  // reserved
   .word 0                                                  // reserved
   .word 0                                                  // reserved
@@ -197,10 +193,9 @@ isr_vector:
 /**
  * @brief  This code is called when processor starts execution.
  *
- *         This is the code that gets called when the processor first
- *         starts execution following a reset event. We first define and init 
- *         the bss section and then define and init the data section, after which
- *         the application supplied main routine is called.
+ *         This is the code that gets called when the processor first starts execution following a reset event. We 
+ *         first define and init the bss section and then define and init the data section, after which the 
+ *         application supplied main routine is called.
  *
  * @param  None
  * @retval None
@@ -208,30 +203,30 @@ isr_vector:
 .type Reset_Handler, %function
 .global Reset_Handler
 Reset_Handler:
-  LDR   R0, =_estack                                       // load address at end of the stack into R0
-  MOV   SP, R0                                             // move address at end of stack into SP
-  LDR   R0, =_sdata                                        // copy the data segment initializers from flash to SRAM
-  LDR   R1, =_edata                                        // copy the data segment initializers from flash to SRAM
-  LDR   R2, =_sidata                                       // copy the data segment initializers from flash to SRAM
-  MOVS  R3, #0                                             // copy the data segment initializers from flash to SRAM
+  LDR   R4, =_estack                                       // load address at end of the stack into R0
+  MOV   SP, R4                                             // move address at end of stack into SP
+  LDR   R4, =_sdata                                        // copy the data segment initializers from flash to SRAM
+  LDR   R5, =_edata                                        // copy the data segment initializers from flash to SRAM
+  LDR   R6, =_sidata                                       // copy the data segment initializers from flash to SRAM
+  MOVS  R7, #0                                             // copy the data segment initializers from flash to SRAM
   B     .Reset_Handler_Loop_Copy_Data_Init                 // branch
 .Reset_Handler_Copy_Data_Init:
-  LDR   R4, [R2, R3]                                       // copy the data segment initializers into registers
-  STR   R4, [R0, R3]                                       // copy the data segment initializers into registers
-  ADDS  R3, R3, #4                                         // copy the data segment initializers into registers
+  LDR   R8, [R6, R7]                                       // copy the data segment initializers into registers
+  STR   R8, [R4, R7]                                       // copy the data segment initializers into registers
+  ADDS  R7, R7, #4                                         // copy the data segment initializers into registers
 .Reset_Handler_Loop_Copy_Data_Init:
-  ADDS  R4, R0, R3                                         // initialize the data segment
-  CMP   R4, R1                                             // initialize the data segment
+  ADDS  R8, R4, R7                                         // initialize the data segment
+  CMP   R8, R5                                             // initialize the data segment
   BCC   .Reset_Handler_Copy_Data_Init                      // branch if carry is clear
-  LDR   R2, =_sbss                                         // copy the bss segment initializers from flash to SRAM
-  LDR   R4, =_ebss                                         // copy the bss segment initializers from flash to SRAM
-  MOVS  R3, #0                                             // copy the bss segment initializers from flash to SRAM
+  LDR   R6, =_sbss                                         // copy the bss segment initializers from flash to SRAM
+  LDR   R8, =_ebss                                         // copy the bss segment initializers from flash to SRAM
+  MOVS  R7, #0                                             // copy the bss segment initializers from flash to SRAM
   B     .Reset_Handler_Loop_Fill_Zero_BSS                  // branch
 .Reset_Handler_Fill_Zero_BSS:
-  STR   R3, [R2]                                           // zero fill the bss segment
-  ADDS  R2, R2, #4                                         // zero fill the bss segment
+  STR   R7, [R6]                                           // zero fill the bss segment
+  ADDS  R6, R6, #4                                         // zero fill the bss segment
 .Reset_Handler_Loop_Fill_Zero_BSS:
-  CMP   R2, R4                                             // zero fill the bss segment
+  CMP   R6, R8                                             // zero fill the bss segment
   BCC   .Reset_Handler_Fill_Zero_BSS                       // branch if carry is clear
   BL    main                                               // call function
 
@@ -270,7 +265,7 @@ Default_Handler:
 .type main, %function
 .global main
 main:
-  PUSH  {R4-R11, LR}                                       // push registers R4-R11, LR to the stack
+  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
   BL    GPIOB_Enable                                       // call function
   BL    GPIOB_PB8_Alt_Function_Mode_Enable                 // call function
   BL    GPIOB_PB8_Open_Drain_Enable                        // call function
@@ -331,27 +326,26 @@ main:
   BL    SSD1306_Display_Letter                             // call function
   BL    SSD1306_Turn_On_Display                            // call function
   BL    Loop                                               // call function
-  POP   {R4-R11, LR}                                       // pop registers R4-R11, LR from the stack
+  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
   BX    LR                                                 // return to caller
 
 /**
  * @brief   Enables the GPIOB peripheral by setting the corresponding RCC_AHB1ENR bit.
  *
- * @details This function enables the GPIOB peripheral by setting the corresponding
- *          RCC_AHB1ENR bit.  It loads the address of the RCC_AHB1ENR register, retrieves
- *          the current value of the register, sets the GPIOBEN bit, and stores the
- *          updated value back into the register.
+ * @details This function enables the GPIOB peripheral by setting the corresponding RCC_AHB1ENR bit. It loads the 
+ *          address of the RCC_AHB1ENR register, retrieves the current value of the register, sets the GPIOBEN bit, 
+ *          and stores the updated value back into the register.
  *
  * @param   None
  * @retval  None
  */
 GPIOB_Enable:
-  PUSH  {R4-R11, LR}                                       // push registers R4-R11, LR to the stack
+  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
   LDR   R4, =0x40023830                                    // load address of RCC_AHB1ENR register
   LDR   R5, [R4]                                           // load value inside RCC_AHB1ENR register
   ORR   R5, #(1<<1)                                        // set the GPIOBEN bit
   STR   R5, [R4]                                           // store value into RCC_AHB1ENR register
-  POP   {R4-R11, LR}                                       // pop registers R4-R11, LR from the stack
+  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
   BX    LR                                                 // return to caller
 
 /**
@@ -366,7 +360,7 @@ GPIOB_Enable:
  * @retval  None
  */
 GPIOB_PB8_Alt_Function_Mode_Enable:
-  PUSH  {R4-R11, LR}                                       // push registers R4-R11, LR to the stack
+  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
   LDR   R4, =0x40020400                                    // load address of GPIOB_MODER register
   LDR   R5, [R4]                                           // load value inside GPIOB_MODER register
   ORR   R5, #(1<<17)                                       // set the MODER8 bit
@@ -379,7 +373,7 @@ GPIOB_PB8_Alt_Function_Mode_Enable:
   BIC   R5, #(1<<1)                                        // clear the AFRH8 bit
   BIC   R5, #(1<<0)                                        // clear the AFRH8 bit
   STR   R5, [R4]                                           // store value into GPIOB_AFRH register
-  POP   {R4-R11, LR}                                       // pop registers R4-R11, LR from the stack
+  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
   BX    LR                                                 // return to caller
 
 /**
@@ -392,12 +386,12 @@ GPIOB_PB8_Alt_Function_Mode_Enable:
  * @retval  None
  */
 GPIOB_PB8_Open_Drain_Enable:
-  PUSH  {R4-R11, LR}                                       // push registers R4-R11, LR to the stack
+  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
   LDR   R4, =0x40020404                                    // load address of GPIOB_OTYPER register
   LDR   R5, [R4]                                           // load value inside GPIOB_OTYPER register
   ORR   R5, #(1<<8)                                        // set the OT8 bit
   STR   R5, [R4]                                           // store value into GPIOB_OTYPER register
-  POP   {R4-R11, LR}                                       // pop registers R4-R11, LR from the stack
+  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
   BX    LR                                                 // return to caller
 
 /**
@@ -412,7 +406,7 @@ GPIOB_PB8_Open_Drain_Enable:
  * @retval  None
  */
 GPIOB_PB9_Alt_Function_Mode_Enable:
-  PUSH  {R4-R11, LR}                                       // push registers R4-R11, LR to the stack
+  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
   LDR   R4, =0x40020400                                    // load address of GPIOB_MODER register
   LDR   R5, [R4]                                           // load value inside GPIOB_MODER register
   ORR   R5, #(1<<19)                                       // set the MODER9 bit
@@ -425,7 +419,7 @@ GPIOB_PB9_Alt_Function_Mode_Enable:
   BIC   R5, #(1<<5)                                        // clear the AFRH9 bit
   BIC   R5, #(1<<4)                                        // clear the AFRH9 bit
   STR   R5, [R4]                                           // store value into GPIOB_AFRH register
-  POP   {R4-R11, LR}                                       // pop registers R4-R11, LR from the stack
+  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
   BX    LR                                                 // return to caller
 
 /**
@@ -438,12 +432,12 @@ GPIOB_PB9_Alt_Function_Mode_Enable:
  * @retval  None
  */
 GPIOB_PB9_Open_Drain_Enable:
-  PUSH  {R4-R11, LR}                                       // push registers R4-R11, LR to the stack
+  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
   LDR   R4, =0x40020404                                    // load address of GPIOB_OTYPER register
   LDR   R5, [R4]                                           // load value inside GPIOB_OTYPER register
   ORR   R5, #(1<<9)                                        // set the OT9 bit
   STR   R5, [R4]                                           // store value into GPIOB_OTYPER register
-  POP   {R4-R11, LR}                                       // pop registers R4-R11, LR from the stack
+  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
   BX    LR                                                 // return to caller
 
 /**
@@ -458,12 +452,12 @@ GPIOB_PB9_Open_Drain_Enable:
  * @retval  None
  */
 I2C1_Enable:
-  PUSH  {R4-R11, LR}                                       // push registers R4-R11, LR to the stack
+  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
   LDR   R4, =0x40023840                                    // load address of RCC_APB1ENR register
   LDR   R5, [R4]                                           // load value inside RCC_APB1ENR register
   ORR   R5, #(1<<21)                                       // set the I2C1EN bit
   STR   R5, [R4]                                           // store value into RCC_APB1ENR register
-  POP   {R4-R11, LR}                                       // pop registers R4-R11, LR from the stack
+  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
   BX    LR                                                 // return to caller
 
 /**
@@ -478,7 +472,7 @@ I2C1_Enable:
  * @retval  None
  */
 I2C1_Init:
-  PUSH  {R4-R11, LR}                                       // push registers R4-R11, LR to the stack
+  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
   LDR   R4, =0x40005400                                    // load address of I2C1_CR1 register
   LDR   R5, [R4]                                           // load value inside I2C1_CR1 register
   ORR   R5, #(1<<15)                                       // set the SWRST bit
@@ -513,7 +507,7 @@ I2C1_Init:
   LDR   R5, [R4]                                           // load value inside I2C1_CR1 register
   ORR   R5, #(1<<0)                                        // set the PE bit
   STR   R5, [R4]                                           // store value into I2C1_CR1 register
-  POP   {R4-R11, LR}                                       // pop registers R4-R11, LR from the stack
+  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
   BX    LR                                                 // return to caller
 
 /**
@@ -527,7 +521,9 @@ I2C1_Init:
  * @retval  None
  */
 SSD1306_Init:
-  PUSH  {R4-R11, LR}                                       // push registers R4-R11, LR to the stack
+  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
+  BL    Thirty_Microsecond_Delay                           // call function
+  BL    Thirty_Microsecond_Delay                           // call function
   MOV   R0, #0x3C                                          // SSD1306 I2C addr
   MOV   R1, #0x00                                          // command mode
   MOV   R2, #0x20                                          // set memory addressing mode, page addressing mode
@@ -581,7 +577,7 @@ SSD1306_Init:
   MOV   R2, #0x14                                          // enable charge pump
   BL    I2C_Write_Byte                                     // call function
   BL    SSD1306_Clear_Screen                               // call function
-  POP   {R4-R11, LR}                                       // pop registers R4-R11, LR from the stack
+  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
   BX    LR                                                 // return to caller
 
 /**
@@ -594,12 +590,12 @@ SSD1306_Init:
  * @retval  None
  */
 SSD1306_Turn_On_Display:
-  PUSH  {R4-R11, LR}                                       // push registers R4-R11, LR to the stack
+  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
   MOV   R0, #0x3C                                          // SSD1306 I2C addr
   MOV   R1, #0x00                                          // command mode
   MOV   R2, #0xAF                                          // set display on
   BL    I2C_Write_Byte                                     // call function
-  POP   {R4-R11, LR}                                       // pop registers R4-R11, LR from the stack
+  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
   BX    LR                                                 // return to caller
 
 /**
@@ -612,12 +608,12 @@ SSD1306_Turn_On_Display:
  * @retval  None
  */
 SSD1306_Turn_Off_Display:
-  PUSH  {R4-R11, LR}                                       // push registers R4-R11, LR to the stack
+  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
   MOV   R0, #0x3C                                          // SSD1306 I2C addr
   MOV   R1, #0x00                                          // command mode
   MOV   R2, #0xAE                                          // set display off
   BL    I2C_Write_Byte                                     // call function
-  POP   {R4-R11, LR}                                       // pop registers R4-R11, LR from the stack
+  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
   BX    LR                                                 // return to caller
 
 /**
@@ -634,7 +630,7 @@ SSD1306_Turn_Off_Display:
  * @retval  None
  */
 SSD1306_Set_Cursor:
-  PUSH  {R4-R11, LR}                                       // push registers R4-R11, LR to the stack
+  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
   MOV   R4, R0                                             // copy first arg into R4
   MOV   R5, R1                                             // copy second arg into R5
   MOV   R6, R2                                             // copy third arg into R6 
@@ -650,7 +646,7 @@ SSD1306_Set_Cursor:
   MOV   R1, #0x00                                          // memory addr
   MOV   R2, R6                                             // page start addr
   BL    I2C_Write_Byte                                     // call function
-  POP   {R4-R11, LR}                                       // pop registers R4-R11, LR from the stack
+  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
   BX    LR                                                 // return to caller
 
 /**
@@ -665,7 +661,7 @@ SSD1306_Set_Cursor:
  * @retval  None
  */
 SSD1306_Clear_Screen:
-  PUSH  {R4-R11, LR}                                       // push registers R4-R11, LR to the stack
+  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
   MOV   R0, #0x00                                          // lower col start addr
   MOV   R1, #0x10                                          // higher col start addr
   MOV   R2, #0xB0                                          // page start addr
@@ -679,7 +675,7 @@ SSD1306_Clear_Screen:
   ADD   R11, #0x1                                          // increment counter
   CMP   R11, #0x480                                        // cmp if 0x480
   BNE   .SSD1306_Clear_Screen_Loop                         // branch not equal
-  POP   {R4-R11, LR}                                       // pop registers R4-R11, LR from the stack
+  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
   BX    LR                                                 // return to caller
 
 /**
@@ -698,7 +694,7 @@ SSD1306_Clear_Screen:
  * @retval  None
  */
 SSD1306_Display_Letter:
-  PUSH  {R4-R11, LR}                                       // push registers R4-R11, LR to the stack
+  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
   MOV   R4, R0                                             // copy first arg into R4
   MOV   R5, R1                                             // copy second arg into R5
   MOV   R6, R2                                             // copy third arg into R6
@@ -711,9 +707,9 @@ SSD1306_Display_Letter:
   LDRB  R2, [R7, R12]                                      // load  byte at addr in R8 and inc by counter
   BL    I2C_Write_Byte                                     // call function
   ADDS  R12, #1                                            // inc counter
-  CMP   R12, #12                                           // compare if end of array
+  CMP   R12, #6                                            // compare if end of array
   BNE   .SSD1306_Display_Letter_Loop                       // branch if not equal
-  POP   {R4-R11, LR}                                       // pop registers R4-R11, LR from the stack
+  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
   BX    LR                                                 // return to caller
 
 /**
@@ -729,7 +725,7 @@ SSD1306_Display_Letter:
  * @retval  None
  */
 I2C_Write_Byte:
-  PUSH  {R4-R11, LR}                                       // push registers R4-R11, LR to the stack
+  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
   MOV   R4, R0                                             // copy first arg into R4
   MOV   R5, R1                                             // copy second arg into R5
   MOV   R6, R2                                             // copy third arg into R6
@@ -786,7 +782,30 @@ I2C_Write_Byte:
   ORR   R8, #(1<<9)                                        // set the STOP bit
   ORR   R8, #(1<<0)                                        // set the PE bit
   STR   R8, [R7]                                           // store value into I2C1_CR1 register
-  POP   {R4-R11, LR}                                       // pop registers R4-R11, LR from the stack
+  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
+  BX    LR                                                 // return to caller
+
+/**
+ * @brief  Delay for approximately 30 microseconds.
+ *
+ *         This function creates a delay of approximately 30 microseconds.
+ *
+ * @param  None
+ * @retval None
+ */
+Thirty_Microsecond_Delay:
+  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack 
+  MOV   R4, #0x7                                           // number of loops
+.Thirty_Microsecond_Delay_Outer_Loop:
+  MOV   R5, #0xFFFF                                        // set initial delay count
+.Thirty_Microsecond_Delay_Inner_Loop:
+  SUB   R5, #1                                             // decrement delay count
+  CMP   R5, #0                                             // check if delay count reached zero
+  BNE   .Thirty_Microsecond_Delay_Inner_Loop               // continue loop if delay count not reached zero
+  SUB   R4, #1                                             // decrement loop counter
+  CMP   R4, #0                                             // check if delay count reached zero
+  BNE   .Thirty_Microsecond_Delay_Outer_Loop               // continue outer loop if more loops to go
+  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
   BX    LR                                                 // return to caller
 
 /**
@@ -807,60 +826,61 @@ Loop:
  * The .rodata section is used for constants and static strings.
  */
 .section .rodata
+
 LETTER_A:
-  .byte 0xC0, 0x00, 0x38, 0x00, 0x26, 0x00, 0x38, 0x00, 0xC0, 0x00, 0x00, 0x00
+  .byte 0x00, 0x7C, 0x12, 0x11, 0x12, 0x7C, 0x41
 LETTER_B:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x92, 0x00, 0x92, 0x00, 0x92, 0x00, 0x6C, 0x00
+  .byte 0x00, 0x7F, 0x49, 0x49, 0x49, 0x36, 0x42
 LETTER_C:
-  .byte 0x7C, 0x00, 0x82, 0x00, 0x82, 0x00, 0x82, 0x00, 0x64, 0x00, 0x00, 0x00
+  .byte 0x00, 0x3E, 0x41, 0x41, 0x41, 0x22, 0x43
 LETTER_D:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x82, 0x00, 0x82, 0x00, 0x82, 0x00, 0x7C, 0x00
+  .byte 0x00, 0x7F, 0x41, 0x41, 0x22, 0x1C, 0x44
 LETTER_E:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x92, 0x00, 0x92, 0x00, 0x92, 0x00, 0x00, 0x00
+  .byte 0x00, 0x7F, 0x49, 0x49, 0x49, 0x41, 0x45
 LETTER_F:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x12, 0x00, 0x12, 0x00, 0x12, 0x00, 0x00, 0x00
+  .byte 0x00, 0x7F, 0x09, 0x09, 0x09, 0x01, 0x46
 LETTER_G:
-  .byte 0x7C, 0x00, 0x82, 0x00, 0x82, 0x00, 0x92, 0x00, 0x74, 0x00, 0x00, 0x00
+  .byte 0x00, 0x3E, 0x41, 0x49, 0x49, 0x7A, 0x47
 LETTER_H:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x10, 0x00, 0x10, 0x00, 0x10, 0x00, 0xFE, 0x00
+  .byte 0x00, 0x7F, 0x08, 0x08, 0x08, 0x7F, 0x48
 LETTER_I:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+  .byte 0x00, 0x00, 0x41, 0x7F, 0x41, 0x00, 0x49
 LETTER_J:
-  .byte 0x40, 0x00, 0x80, 0x00, 0x80, 0x00, 0x7E, 0x00, 0x00, 0x00, 0x00, 0x00
+  .byte 0x00, 0x20, 0x40, 0x41, 0x3F, 0x01, 0x4A
 LETTER_K:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x10, 0x00, 0x18, 0x00, 0x64, 0x00, 0x82, 0x00
+  .byte 0x00, 0x7F, 0x08, 0x14, 0x22, 0x41, 0x4B
 LETTER_L:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x00, 0x00
+  .byte 0x00, 0x7F, 0x40, 0x40, 0x40, 0x40, 0x4C
 LETTER_M:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x18, 0x00, 0xF0, 0x00, 0x18, 0x00, 0xFE, 0x00
+  .byte 0x00, 0x7F, 0x02, 0x0C, 0x02, 0x7F, 0x4D
 LETTER_N:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x0C, 0x00, 0x38, 0x00, 0x60, 0x00, 0xFE, 0x00
+  .byte 0x00, 0x7F, 0x04, 0x08, 0x10, 0x7F, 0x4E
 LETTER_O:
-  .byte 0x7C, 0x00, 0xC6, 0x00, 0x82, 0x00, 0x82, 0x00, 0xC2, 0x00, 0x7C, 0x00
+  .byte 0x00, 0x3E, 0x41, 0x41, 0x41, 0x3E, 0x4F
 LETTER_P:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x12, 0x00, 0x12, 0x00, 0x12, 0x00, 0x0C, 0x00
+  .byte 0x00, 0x7F, 0x09, 0x09, 0x09, 0x06, 0x50
 LETTER_Q:
-  .byte 0x7C, 0x00, 0xC6, 0x00, 0x82, 0x00, 0x82, 0x00, 0xC6, 0x00, 0xFC, 0x01
+  .byte 0x00, 0x3E, 0x41, 0x51, 0x21, 0x5E, 0x51
 LETTER_R:
-  .byte 0x00, 0x00, 0xFE, 0x00, 0x12, 0x00, 0x12, 0x00, 0x72, 0x00, 0x8E, 0x00
+  .byte 0x00, 0x7F, 0x09, 0x19, 0x29, 0x46, 0x52
 LETTER_S:
-  .byte 0x00, 0x00, 0x6C, 0x00, 0xCA, 0x00, 0x92, 0x00, 0x92, 0x00, 0x74, 0x00
+  .byte 0x00, 0x46, 0x49, 0x49, 0x49, 0x31, 0x53
 LETTER_T:
-  .byte 0x02, 0x00, 0x02, 0x00, 0xFE, 0x00, 0x02, 0x00, 0x02, 0x00, 0x00, 0x00
+  .byte 0x00, 0x01, 0x01, 0x7F, 0x01, 0x01, 0x54
 LETTER_U:
-  .byte 0x00, 0x00, 0x7E, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x7E, 0x00
+  .byte 0x00, 0x3F, 0x40, 0x40, 0x40, 0x3F, 0x55
 LETTER_V:
-  .byte 0x06, 0x00, 0x38, 0x00, 0xC0, 0x00, 0x38, 0x00, 0x06, 0x00, 0x00, 0x00
+  .byte 0x00, 0x1F, 0x20, 0x40, 0x20, 0x1F, 0x56
 LETTER_W:
-  .byte 0x7E, 0x00, 0xE0, 0x00, 0x30, 0x00, 0x3E, 0x00, 0x60, 0x00, 0xFE, 0x00
+  .byte 0x00, 0x3F, 0x40, 0x38, 0x40, 0x3F, 0x57
 LETTER_X:
-  .byte 0x82, 0x00, 0x6C, 0x00, 0x10, 0x00, 0x6C, 0x00, 0x82, 0x00, 0x00, 0x00
+  .byte 0x00, 0x63, 0x14, 0x08, 0x14, 0x63, 0x58
 LETTER_Y:
-  .byte 0x02, 0x00, 0x0C, 0x00, 0xF0, 0x00, 0x0C, 0x00, 0x02, 0x00, 0x00, 0x00
+  .byte 0x00, 0x07, 0x08, 0x70, 0x08, 0x07, 0x59
 LETTER_Z:
-  .byte 0xC2, 0x00, 0xA2, 0x00, 0x92, 0x00, 0x8A, 0x00, 0x86, 0x00, 0x00, 0x00
-LETTER_SPACE:
-  .byte 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+  .byte 0x00, 0x61, 0x51, 0x49, 0x45, 0x43, 0x5A
+LETTER_NULL:
+  .byte 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 
 /**
