@@ -281,61 +281,61 @@ main:
   BL    I2C1_Init                                     // call function
 .SSD1306_Init:
   BL    SSD1306_Init                                  // call function
-.SSD1306_Display_Letter_H1:
+.SSD1306_Display_Letter_H_1:
   MOV   R0, #0x00                                     // lower col start addr
   MOV   R1, #0x11                                     // higher col start addr
   MOV   R2, #0xB0                                     // page start addr
   LDR   R3, =LETTER_H                                 // load the address of array H
   BL    SSD1306_Display_Letter                        // call function
-.SSD1306_Display_Letter_E1:
+.SSD1306_Display_Letter_E_1:
   MOV   R0, #0x00                                     // lower col start addr
   MOV   R1, #0x12                                     // higher col start addr
   MOV   R2, #0xB0                                     // page start addr
   LDR   R3, =LETTER_E                                 // load the address of array E
   BL    SSD1306_Display_Letter                        // call function
-.SSD1306_Display_Letter_L1:
+.SSD1306_Display_Letter_L_1:
   MOV   R0, #0x00                                     // lower col start addr
   MOV   R1, #0x13                                     // higher col start addr
   MOV   R2, #0xB0                                     // page start addr
   LDR   R3, =LETTER_L                                 // load the address of array L
   BL    SSD1306_Display_Letter                        // call function
-.SSD1306_Display_Letter_L2:
+.SSD1306_Display_Letter_L_2:
   MOV   R0, #0x00                                     // lower col start addr
   MOV   R1, #0x14                                     // higher col start addr
   MOV   R2, #0xB0                                     // page start addr
   LDR   R3, =LETTER_L                                 // load the address of array L
   BL    SSD1306_Display_Letter                        // call function
-.SSD1306_Display_Letter_O1:
+.SSD1306_Display_Letter_O_1:
   MOV   R0, #0x00                                     // lower col start addr
   MOV   R1, #0x15                                     // higher col start addr
   MOV   R2, #0xB0                                     // page start addr
   LDR   R3, =LETTER_O                                 // load the address of array O
   BL    SSD1306_Display_Letter                        // call function
-.SSD1306_Display_Letter_W1:
+.SSD1306_Display_Letter_W_1:
   MOV   R0, #0x00                                     // lower col start addr
   MOV   R1, #0x11                                     // higher col start addr
   MOV   R2, #0xB2                                     // page start addr
   LDR   R3, =LETTER_W                                 // load the address of array O
   BL    SSD1306_Display_Letter                        // call function
-.SSD1306_Display_Letter_O2:
+.SSD1306_Display_Letter_O_2:
   MOV   R0, #0x00                                     // lower col start addr
   MOV   R1, #0x12                                     // higher col start addr
   MOV   R2, #0xB2                                     // page start addr
   LDR   R3, =LETTER_O                                 // load the address of array O
   BL    SSD1306_Display_Letter                        // call function
-.SSD1306_Display_Letter_R1:
+.SSD1306_Display_Letter_R_1:
   MOV   R0, #0x00                                     // lower col start addr
   MOV   R1, #0x13                                     // higher col start addr
   MOV   R2, #0xB2                                     // page start addr
   LDR   R3, =LETTER_R                                 // load the address of array O
   BL    SSD1306_Display_Letter                        // call function
-.SSD1306_Display_Letter_L3:
+.SSD1306_Display_Letter_L_3:
   MOV   R0, #0x00                                     // lower col start addr
   MOV   R1, #0x14                                     // higher col start addr
   MOV   R2, #0xB2                                     // page start addr
   LDR   R3, =LETTER_L                                 // load the address of array O
   BL    SSD1306_Display_Letter                        // call function
-.SSD1306_Display_Letter_D1:
+.SSD1306_Display_Letter_D_1:
   MOV   R0, #0x00                                     // lower col start addr
   MOV   R1, #0x15                                     // higher col start addr
   MOV   R2, #0xB2                                     // page start addr
@@ -360,11 +360,14 @@ main:
  * @retval  None
  */
 GPIOB_Enable:
+.GPIOB_Enable_Push_Registers:
   PUSH  {R4-R12, LR}                                  // push registers R4-R12, LR to the stack
+.GPIOB_Enable_Set_RCC_AHB1ENR:
   LDR   R4, =0x40023830                               // load address of RCC_AHB1ENR register
   LDR   R5, [R4]                                      // load value inside RCC_AHB1ENR register
   ORR   R5, #(1<<1)                                   // set the GPIOBEN bit
   STR   R5, [R4]                                      // store value into RCC_AHB1ENR register
+.GPIOB_Enable_Pop_Registers
   POP   {R4-R12, LR}                                  // pop registers R4-R12, LR from the stack
   BX    LR                                            // return to caller
 
@@ -412,6 +415,7 @@ GPIOB_PB8_Alt_Function_Mode_Enable:
 GPIOB_PB8_Open_Drain_Enable:
 .GPIOB_PB8_Open_Drain_Enable_Push_Registers:
   PUSH  {R4-R12, LR}                                  // push registers R4-R12, LR to the stack
+.GPIOB_PB8_Open_Drain_Enable_GPIOB_OTYPER:
   LDR   R4, =0x40020404                               // load address of GPIOB_OTYPER register
   LDR   R5, [R4]                                      // load value inside GPIOB_OTYPER register
   ORR   R5, #(1<<8)                                   // set the OT8 bit
@@ -432,7 +436,7 @@ GPIOB_PB8_Open_Drain_Enable:
  * @retval  None
  */
 GPIOB_PB9_Alt_Function_Mode_Enable:
-.GPIOB_PB9_Alt_Function_Mode_Enable_Push_Register:
+.GPIOB_PB9_Alt_Function_Mode_Enable_Push_Registers:
   PUSH  {R4-R12, LR}                                  // push registers R4-R12, LR to the stack
 .GPIOB_PB9_Alt_Function_Mode_Enable_Set_MODER9:
   LDR   R4, =0x40020400                               // load address of GPIOB_MODER register
@@ -448,7 +452,7 @@ GPIOB_PB9_Alt_Function_Mode_Enable:
   BIC   R5, #(1<<5)                                   // clear the AFRH9 bit
   BIC   R5, #(1<<4)                                   // clear the AFRH9 bit
   STR   R5, [R4]                                      // store value into GPIOB_AFRH register
-.GPIOB_PB9_Alt_Function_Mode_Enable_Pop_Register:
+.GPIOB_PB9_Alt_Function_Mode_Enable_Pop_Registers:
   POP   {R4-R12, LR}                                  // pop registers R4-R12, LR from the stack
   BX    LR                                            // return to caller
 
@@ -462,14 +466,14 @@ GPIOB_PB9_Alt_Function_Mode_Enable:
  * @retval  None
  */
 GPIOB_PB9_Open_Drain_Enable:
-.GPIOB_PB9_Open_Drain_Enable_Push_Register:
+.GPIOB_PB9_Open_Drain_Enable_Push_Registers:
   PUSH  {R4-R12, LR}                                  // push registers R4-R12, LR to the stack
 .GPIOB_PB9_Open_Drain_Enable_Set_GPIOB_OTYPER:
   LDR   R4, =0x40020404                               // load address of GPIOB_OTYPER register
   LDR   R5, [R4]                                      // load value inside GPIOB_OTYPER register
   ORR   R5, #(1<<9)                                   // set the OT9 bit
   STR   R5, [R4]                                      // store value into GPIOB_OTYPER register
-.GPIOB_PB9_Open_Drain_Enable_Pop_Register:
+.GPIOB_PB9_Open_Drain_Enable_Pop_Registers:
   POP   {R4-R12, LR}                                  // pop registers R4-R12, LR from the stack
   BX    LR                                            // return to caller
 
@@ -485,13 +489,16 @@ GPIOB_PB9_Open_Drain_Enable:
  * @retval  None
  */
 I2C1_Enable:
-  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
-  LDR   R4, =0x40023840                                    // load address of RCC_APB1ENR register
-  LDR   R5, [R4]                                           // load value inside RCC_APB1ENR register
-  ORR   R5, #(1<<21)                                       // set the I2C1EN bit
-  STR   R5, [R4]                                           // store value into RCC_APB1ENR register
-  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
-  BX    LR                                                 // return to caller
+.I2C1_Enable_Push_Registers:
+  PUSH  {R4-R12, LR}                                  // push registers R4-R12, LR to the stack
+.I2C1_Enable_Set_RCC_APB1ENR:
+  LDR   R4, =0x40023840                               // load address of RCC_APB1ENR register
+  LDR   R5, [R4]                                      // load value inside RCC_APB1ENR register
+  ORR   R5, #(1<<21)                                  // set the I2C1EN bit
+  STR   R5, [R4]                                      // store value into RCC_APB1ENR register
+.I2C1_Enable_Pop_Registers:
+  POP   {R4-R12, LR}                                  // pop registers R4-R12, LR from the stack
+  BX    LR                                            // return to caller
 
 /**
  * @brief   Initializes and enables the I2C1 peripheral.
@@ -505,43 +512,50 @@ I2C1_Enable:
  * @retval  None
  */
 I2C1_Init:
-  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
-  LDR   R4, =0x40005400                                    // load address of I2C1_CR1 register
-  LDR   R5, [R4]                                           // load value inside I2C1_CR1 register
-  ORR   R5, #(1<<15)                                       // set the SWRST bit
-  STR   R5, [R4]                                           // store value into I2C1_CR1 register
-  BIC   R5, #(1<<15)                                       // clear the SWRST bit
-  STR   R5, [R4]                                           // store value into I2C1_CR1 register
-  LDR   R4, =0x40005404                                    // load address of I2C1_CR2 register
-  LDR   R5, [R4]                                           // load value inside I2C1_CR2 register
-  ORR   R5, #(1<<5)                                        // set the FREQ bit
-  ORR   R5, #(1<<4)                                        // set the FREQ bit
-  BIC   R5, #(1<<3)                                        // clear the FREQ bit
-  BIC   R5, #(1<<2)                                        // clear the FREQ bit
-  ORR   R5, #(1<<1)                                        // set the FREQ bit
-  BIC   R5, #(1<<0)                                        // clear the FREQ bit
-  STR   R5, [R4]                                           // store value into I2C1_CR2 register
-  LDR   R4, =0x4000541C                                    // load address of I2C1_CCR register
-  LDR   R5, [R4]                                           // load value inside I2C1_CCR register
-  ORR   R5, #(1<<15)                                       // set the F/S bit
-  ORR   R5, #(1<<14)                                       // set the DUTY bit
-  ORR   R5, #(1<<1)                                        // set the CCR bit
-  STR   R5, [R4]                                           // store value into I2C1_CCR register
-  LDR   R4, =0x40005420                                    // load address of I2C1_TRISE register
-  LDR   R5, [R4]                                           // load value inside I2C1_TRISE register
-  BIC   R5, #(1<<5)                                        // clear the TRISE bit
-  ORR   R5, #(1<<4)                                        // set the TRISE bit
-  BIC   R5, #(1<<3)                                        // clear the TRISE bit
-  ORR   R5, #(1<<2)                                        // set the TRISE bit
-  BIC   R5, #(1<<1)                                        // clear the TRISE bit
-  BIC   R5, #(1<<0)                                        // clear the TRISE bit
-  STR   R5, [R4]                                           // store value into I2C1_TRISE register
-  LDR   R4, =0x40005400                                    // load address of I2C1_CR1 register
-  LDR   R5, [R4]                                           // load value inside I2C1_CR1 register
-  ORR   R5, #(1<<0)                                        // set the PE bit
-  STR   R5, [R4]                                           // store value into I2C1_CR1 register
-  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
-  BX    LR                                                 // return to caller
+.I2C1_Init_Push_Registers:
+  PUSH  {R4-R12, LR}                                  // push registers R4-R12, LR to the stack
+.I2C1_Init_Set_I2C1_CR1:
+  LDR   R4, =0x40005400                               // load address of I2C1_CR1 register
+  LDR   R5, [R4]                                      // load value inside I2C1_CR1 register
+  ORR   R5, #(1<<15)                                  // set the SWRST bit
+  STR   R5, [R4]                                      // store value into I2C1_CR1 register
+  BIC   R5, #(1<<15)                                  // clear the SWRST bit
+  STR   R5, [R4]                                      // store value into I2C1_CR1 register
+.I2C1_Init_Set_I2C1_CR2:
+  LDR   R4, =0x40005404                               // load address of I2C1_CR2 register
+  LDR   R5, [R4]                                      // load value inside I2C1_CR2 register
+  ORR   R5, #(1<<5)                                   // set the FREQ bit
+  ORR   R5, #(1<<4)                                   // set the FREQ bit
+  BIC   R5, #(1<<3)                                   // clear the FREQ bit
+  BIC   R5, #(1<<2)                                   // clear the FREQ bit
+  ORR   R5, #(1<<1)                                   // set the FREQ bit
+  BIC   R5, #(1<<0)                                   // clear the FREQ bit
+  STR   R5, [R4]                                      // store value into I2C1_CR2 register
+.I2C1_Init_Set_I2C1_CCR:
+  LDR   R4, =0x4000541C                               // load address of I2C1_CCR register
+  LDR   R5, [R4]                                      // load value inside I2C1_CCR register
+  ORR   R5, #(1<<15)                                  // set the F/S bit
+  ORR   R5, #(1<<14)                                  // set the DUTY bit
+  ORR   R5, #(1<<1)                                   // set the CCR bit
+  STR   R5, [R4]                                      // store value into I2C1_CCR register
+.I2C1_Init_Set_I2C1_TRISE:
+  LDR   R4, =0x40005420                               // load address of I2C1_TRISE register
+  LDR   R5, [R4]                                      // load value inside I2C1_TRISE register
+  BIC   R5, #(1<<5)                                   // clear the TRISE bit
+  ORR   R5, #(1<<4)                                   // set the TRISE bit
+  BIC   R5, #(1<<3)                                   // clear the TRISE bit
+  ORR   R5, #(1<<2)                                   // set the TRISE bit
+  BIC   R5, #(1<<1)                                   // clear the TRISE bit
+  BIC   R5, #(1<<0)                                   // clear the TRISE bit
+  STR   R5, [R4]                                      // store value into I2C1_TRISE register
+.I2C1_Init_Set_I2C1_CR1:
+  LDR   R4, =0x40005400                               // load address of I2C1_CR1 register
+  LDR   R5, [R4]                                      // load value inside I2C1_CR1 register
+  ORR   R5, #(1<<0)                                   // set the PE bit
+  STR   R5, [R4]                                      // store value into I2C1_CR1 register
+.I2C1_Init_Pop_Registers:
+  POP   {R4-R12, LR}                                  // pop registers R4-R12, LR from the stack
+  BX    LR                                            // return to caller
 
 /**
  * @brief   Initializes the SSD1306 OLED Display.
@@ -554,64 +568,81 @@ I2C1_Init:
  * @retval  None
  */
 SSD1306_Init:
-  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
-  BL    Thirty_Microsecond_Delay                           // call function
-  BL    Thirty_Microsecond_Delay                           // call function
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x00                                          // command mode
-  MOV   R2, #0x20                                          // set memory addressing mode, page addressing mode
-  BL    I2C_Write_Byte                                     // call function
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x00                                          // command mode
-  MOV   R2, #0xB0                                          // set page start address for page addressing mode (0-7 pages)
-  BL    I2C_Write_Byte                                     // call function
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x00                                          // command mode
-  MOV   R2, #0xA1                                          // set segment re-map, col addr 127 mapped to SEG0
-  BL    I2C_Write_Byte                                     // call function
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x00                                          // command mode
-  MOV   R2, #0xC8                                          // set COM output scan direction, remapped
-  BL    I2C_Write_Byte                                     // call function
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x00                                          // command mode
-  MOV   R2, #0x00                                          // set lower col start addr for page addr mode
-  BL    I2C_Write_Byte                                     // call function
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x00                                          // command mode
-  MOV   R2, #0x10                                          // set higher col start addr for page addr mode
-  BL    I2C_Write_Byte                                     // call function
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x00                                          // command mode
-  MOV   R2, #0xD5                                          // set display clock
-  BL    I2C_Write_Byte                                     // call function
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x00                                          // command mode
-  MOV   R2, #0xF0                                          // divide ratio/oscillator freq
-  BL    I2C_Write_Byte                                     // call function
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x00                                          // command mode
-  MOV   R2, #0x12                                          // set COM pins hardware config
-  BL    I2C_Write_Byte                                     // call function
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x00                                          // command mode 
-  MOV   R2, #0xDB                                          // set VCOMH deselect level
-  BL    I2C_Write_Byte                                     // call function
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x00                                          // command mode
-  MOV   R2, #0x20                                          // 0.77 VCC
-  BL    I2C_Write_Byte                                     // call function
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x00                                          // command mode
-  MOV   R2, #0x8D                                          // charge pump setting
-  BL    I2C_Write_Byte                                     // call function
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x00                                          // command mode
-  MOV   R2, #0x14                                          // enable charge pump
-  BL    I2C_Write_Byte                                     // call function
-  BL    SSD1306_Clear_Screen                               // call function
-  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
-  BX    LR                                                 // return to caller
+.SSD1306_Init_Push_Registers:
+  PUSH  {R4-R12, LR}                                  // push registers R4-R12, LR to the stack
+.SSD1306_Init_Thirty_Microsecond_Delay_1:
+  BL    Thirty_Microsecond_Delay                      // call function
+.SSD1306_Init_Thirty_Microsecond_Delay_2:
+  BL    Thirty_Microsecond_Delay                      // call function
+.SSD1306_Init_I2C_Write_Byte_1:
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x00                                     // command mode
+  MOV   R2, #0x20                                     // set memory addressing mode, page addressing mode
+  BL    I2C_Write_Byte                                // call function
+.SSD1306_Init_I2C_Write_Byte_2:
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x00                                     // command mode
+  MOV   R2, #0xB0                                     // set page start address for page addressing mode (0-7 pages)
+  BL    I2C_Write_Byte                                // call function
+.SSD1306_Init_I2C_Write_Byte_3:
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x00                                     // command mode
+  MOV   R2, #0xA1                                     // set segment re-map, col addr 127 mapped to SEG0
+  BL    I2C_Write_Byte                                // call function
+.SSD1306_Init_I2C_Write_Byte_4:
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x00                                     // command mode
+  MOV   R2, #0xC8                                     // set COM output scan direction, remapped
+  BL    I2C_Write_Byte                                // call function
+.SSD1306_Init_I2C_Write_Byte_5:
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x00                                     // command mode
+  MOV   R2, #0x00                                     // set lower col start addr for page addr mode
+  BL    I2C_Write_Byte                                // call function
+.SSD1306_Init_I2C_Write_Byte_6:
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x00                                     // command mode
+  MOV   R2, #0x10                                     // set higher col start addr for page addr mode
+  BL    I2C_Write_Byte                                // call function
+.SSD1306_Init_I2C_Write_Byte_7:
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x00                                     // command mode
+  MOV   R2, #0xD5                                     // set display clock
+  BL    I2C_Write_Byte                                // call function
+.SSD1306_Init_I2C_Write_Byte_8:
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x00                                     // command mode
+  MOV   R2, #0xF0                                     // divide ratio/oscillator freq
+  BL    I2C_Write_Byte                                // call function
+.SSD1306_Init_I2C_Write_Byte_9:
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x00                                     // command mode
+  MOV   R2, #0x12                                     // set COM pins hardware config
+  BL    I2C_Write_Byte                                // call function
+.SSD1306_Init_I2C_Write_Byte_a:
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x00                                     // command mode 
+  MOV   R2, #0xDB                                     // set VCOMH deselect level
+.SSD1306_Init_I2C_Write_Byte_b:
+  BL    I2C_Write_Byte                                // call function
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x00                                     // command mode
+  MOV   R2, #0x20                                     // 0.77 VCC
+  BL    I2C_Write_Byte                                // call function
+.SSD1306_Init_I2C_Write_Byte_c:
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x00                                     // command mode
+  MOV   R2, #0x8D                                     // charge pump setting
+  BL    I2C_Write_Byte                                // call function
+.SSD1306_Init_I2C_Write_Byte_d:
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x00                                     // command mode
+  MOV   R2, #0x14                                     // enable charge pump
+  BL    I2C_Write_Byte                                // call function
+  BL    SSD1306_Clear_Screen                          // call function
+.SSD1306_Init_Pop_Registers:
+  POP   {R4-R12, LR}                                  // pop registers R4-R12, LR from the stack
+  BX    LR                                            // return to caller
 
 /**
  * @brief   Turns on the SSD1306 OLED Display.
@@ -623,13 +654,16 @@ SSD1306_Init:
  * @retval  None
  */
 SSD1306_Turn_On_Display:
-  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x00                                          // command mode
-  MOV   R2, #0xAF                                          // set display on
-  BL    I2C_Write_Byte                                     // call function
-  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
-  BX    LR                                                 // return to caller
+.SSD1306_Turn_On_Display_Push_Registers:
+  PUSH  {R4-R12, LR}                                  // push registers R4-R12, LR to the stack
+.SSD1306_Turn_On_Display_I2C_Write_Byte_1:
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x00                                     // command mode
+  MOV   R2, #0xAF                                     // set display on
+  BL    I2C_Write_Byte                                // call function
+.SSD1306_Turn_On_Display_Pop_Registers:
+  POP   {R4-R12, LR}                                  // pop registers R4-R12, LR from the stack
+  BX    LR                                            // return to caller
 
 /**
  * @brief   Turns off the SSD1306 OLED Display.
@@ -641,13 +675,16 @@ SSD1306_Turn_On_Display:
  * @retval  None
  */
 SSD1306_Turn_Off_Display:
-  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x00                                          // command mode
-  MOV   R2, #0xAE                                          // set display off
-  BL    I2C_Write_Byte                                     // call function
-  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
-  BX    LR                                                 // return to caller
+.SSD1306_Turn_Off_Display_Push_Registers:
+  PUSH  {R4-R12, LR}                                  // push registers R4-R12, LR to the stack
+.SSD1306_Turn_Off_Display_I2C_Write_Byte_1:
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x00                                     // command mode
+  MOV   R2, #0xAE                                     // set display off
+  BL    I2C_Write_Byte                                // call function
+.SSD1306_Turn_Off_Display_Pop_Registers:
+  POP   {R4-R12, LR}                                  // pop registers R4-R12, LR from the stack
+  BX    LR                                            // return to caller
 
 /**
  * @brief   Sets the cursor position on the SSD1306 OLED Display.
@@ -663,53 +700,62 @@ SSD1306_Turn_Off_Display:
  * @retval  None
  */
 SSD1306_Set_Cursor:
-  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
-  MOV   R4, R0                                             // copy first arg into R4
-  MOV   R5, R1                                             // copy second arg into R5
-  MOV   R6, R2                                             // copy third arg into R6 
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x00                                          // command mode
-  MOV   R2, R4                                             // lower col start addr
-  BL    I2C_Write_Byte                                     // call function
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x00                                          // command mode
-  MOV   R2, R5                                             // higher col start addr
-  BL    I2C_Write_Byte                                     // call function
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x00                                          // memory addr
-  MOV   R2, R6                                             // page start addr
-  BL    I2C_Write_Byte                                     // call function
-  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
-  BX    LR                                                 // return to caller
+.SSD1306_Set_Cursor_Push_Registers:
+  PUSH  {R4-R12, LR}                                  // push registers R4-R12, LR to the stack
+.SSD1306_Set_Cursor_I2C_Write_Byte_1:
+  MOV   R4, R0                                        // copy first arg into R4
+  MOV   R5, R1                                        // copy second arg into R5
+  MOV   R6, R2                                        // copy third arg into R6 
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x00                                     // command mode
+  MOV   R2, R4                                        // lower col start addr
+  BL    I2C_Write_Byte                                // call function
+.SSD1306_Set_Cursor_I2C_Write_Byte_2:
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x00                                     // command mode
+  MOV   R2, R5                                        // higher col start addr
+  BL    I2C_Write_Byte                                // call function
+.SSD1306_Set_Cursor_I2C_Write_Byte_3:
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x00                                     // memory addr
+  MOV   R2, R6                                        // page start addr
+  BL    I2C_Write_Byte                                // call function
+.SSD1306_Set_Cursor_Pop_Registers:
+  POP   {R4-R12, LR}                                  // pop registers R4-R12, LR from the stack
+  BX    LR                                            // return to caller
 
 /**
  * @brief   Clears the screen of the SSD1306 OLED Display.
  *
  * @details This assembly function clears the entire screen of the SSD1306 OLED display by sending
- *          the necessary commands and data through I2C communication. It utilizes the SSD1306_Set_Cursor
- *          function to position the cursor at the beginning of the display and then writes data to
- *          fill the screen with zeros.
+ *          the necessary commands and data through I2C communication. It utilizes the
+ *          SSD1306_Set_Cursor function to position the cursor at the beginning of the display
+ *          and then writes data to fill the screen with zeros.
  *
  * @param   None
  * @retval  None
  */
 SSD1306_Clear_Screen:
-  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
-  MOV   R0, #0x00                                          // lower col start addr
-  MOV   R1, #0x10                                          // higher col start addr
-  MOV   R2, #0xB0                                          // page start addr
-  BL    SSD1306_Set_Cursor                                 // call function
-  MOV   R4, #0x00                                          // set counter
-.SSD1306_Clear_Screen_Loop:
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x40                                          // data mode
-  MOV   R2, #0                                             // data
-  BL    I2C_Write_Byte                                     // call function
-  ADD   R4, #0x1                                           // increment counter
-  CMP   R4, #0x480                                         // cmp if 0x480
-  BNE   .SSD1306_Clear_Screen_Loop                         // branch not equal
-  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
-  BX    LR                                                 // return to caller
+.SSD1306_Clear_Screen_Push_Registers:
+  PUSH  {R4-R12, LR}                                  // push registers R4-R12, LR to the stack
+.SSD1306_Clear_Screen_SSD1306_Set_Cursor:
+  MOV   R0, #0x00                                     // lower col start addr
+  MOV   R1, #0x10                                     // higher col start addr
+  MOV   R2, #0xB0                                     // page start addr
+  BL    SSD1306_Set_Cursor                            // call function
+.SSD1306_Clear_Screen_I2C_Write_Byte_1:
+  MOV   R4, #0x00                                     // set counter
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x40                                     // data mode
+  MOV   R2, #0                                        // data
+  BL    I2C_Write_Byte                                // call function
+.SSD1306_Clear_Screen_SSD1306_Clear_Screen_Loop:
+  ADD   R4, #0x1                                      // increment counter
+  CMP   R4, #0x480                                    // cmp if 0x480
+  BNE   .SSD1306_Clear_Screen_Loop                    // branch not equal
+.SSD1306_Clear_Screen_Pop_Registers:
+  POP   {R4-R12, LR}                                  // pop registers R4-R12, LR from the stack
+  BX    LR                                            // return to caller
 
 /**
  * @brief   Displays a letter (character array) on the SSD1306 OLED Display.
