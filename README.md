@@ -773,23 +773,30 @@ SSD1306_Clear_Screen:
  * @retval  None
  */
 SSD1306_Display_Letter:
-  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
-  MOV   R4, R0                                             // copy first arg into R4
-  MOV   R5, R1                                             // copy second arg into R5
-  MOV   R6, R2                                             // copy third arg into R6
-  MOV   R7, R3                                             // copy fourth arg into R7
-  BL    SSD1306_Set_Cursor                                 // call function
-  MOV   R8, #0                                             // set counter
+.SSD1306_Display_Letter_Push_Registers:
+  PUSH  {R4-R12, LR}                                  // push registers R4-R12, LR to the stack
+.SSD1306_Display_Letter_SSD1306_Set_Cursor:
+  MOV   R4, R0                                        // copy first arg into R4
+  MOV   R5, R1                                        // copy second arg into R5
+  MOV   R6, R2                                        // copy third arg into R6
+  MOV   R7, R3                                        // copy fourth arg into R7
+  BL    SSD1306_Set_Cursor                            // call function
+.SSD1306_Display_Letter_Set_Counter:
+  MOV   R8, #0                                        // set counter
 .SSD1306_Display_Letter_Loop:
-  MOV   R0, #0x3C                                          // SSD1306 I2C addr
-  MOV   R1, #0x40                                          // data mode
-  LDRB  R2, [R7, R8]                                       // load  byte at addr in R8 and inc by counter
-  BL    I2C_Write_Byte                                     // call function
-  ADDS  R8, #1                                             // inc counter
-  CMP   R8, #6                                             // compare if end of array
-  BNE   .SSD1306_Display_Letter_Loop                       // branch if not equal
-  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
-  BX    LR                                                 // return to caller
+.SSD1306_Display_Letter_I2C_Write_Byte_1:
+  MOV   R0, #0x3C                                     // SSD1306 I2C addr
+  MOV   R1, #0x40                                     // data mode
+  LDRB  R2, [R7, R8]                                  // load  byte at addr in R8 and inc by counter
+  BL    I2C_Write_Byte                                // call function
+.SSD1306_Display_Letter_Inc_Counter:
+  ADDS  R8, #1                                        // inc counter
+.SSD1306_Display_Letter_CMP_End_Of_Array:
+  CMP   R8, #6                                        // compare if end of array
+  BNE   .SSD1306_Display_Letter_Loop                  // branch if not equal
+.SSD1306_Display_Letter_Pop_Registers:
+  POP   {R4-R12, LR}                                  // pop registers R4-R12, LR from the stack
+  BX    LR                                            // return to caller
 
 /**
  * @brief   Writes a byte to the I2C device.
@@ -804,65 +811,69 @@ SSD1306_Display_Letter:
  * @retval  None
  */
 I2C_Write_Byte:
-  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack
-  MOV   R4, R0                                             // copy first arg into R4
-  MOV   R5, R1                                             // copy second arg into R5
-  MOV   R6, R2                                             // copy third arg into R6
+.I2C_Write_Byte_Push_Registers:
+  PUSH  {R4-R12, LR}                                  // push registers R4-R12, LR to the stack
+.I2C_Write_Byte_Copy_Params:
+  MOV   R4, R0                                        // copy first arg into R4
+  MOV   R5, R1                                        // copy second arg into R5
+  MOV   R6, R2                                        // copy third arg into R6
 .I2C_Wait_Not_Busy:
-  LDR   R7, =0x40005418                                    // load address of I2C1_SR2 register
-  LDR   R8, [R7]                                           // load value inside I2C1_SR2 register
-  TST   R8, #(1<<1)                                        // read the BUSY bit, if 0, then BNE
-  BNE   .I2C_Wait_Not_Busy                                 // branch if not equal
-  LDR   R7, =0x40005400                                    // load address of I2C1_CR1 register
-  LDR   R8, [R7]                                           // load value inside I2C1_CR1 register
-  ORR   R8, #(1<<8)                                        // set the START bit
-  ORR   R8, #(1<<0)                                        // set the PE bit
-  STR   R8, [R7]                                           // store value into I2C1_CR1 register
+  LDR   R7, =0x40005418                               // load address of I2C1_SR2 register
+  LDR   R8, [R7]                                      // load value inside I2C1_SR2 register
+  TST   R8, #(1<<1)                                   // read the BUSY bit, if 0, then BNE
+  BNE   .I2C_Wait_Not_Busy                            // branch if not equal
+.I2C_Write_Byte_Set_I2C1_CR1:
+  LDR   R7, =0x40005400                               // load address of I2C1_CR1 register
+  LDR   R8, [R7]                                      // load value inside I2C1_CR1 register
+  ORR   R8, #(1<<8)                                   // set the START bit
+  ORR   R8, #(1<<0)                                   // set the PE bit
+  STR   R8, [R7]                                      // store value into I2C1_CR1 register
 .I2C_Wait_Start:
-  LDR   R7, =0x40005414                                    // load address of I2C1_SR1 register
-  LDR   R8, [R7]                                           // load value inside I2C1_SR1 register
-  TST   R8, #(1<<0)                                        // read the SB bit, if 1, then BEQ
-  BEQ   .I2C_Wait_Start                                    // branch if equal
-  LDR   R7, =0x40005410                                    // load address of I2C1_DR register
-  LSL   R4, #1                                             // left shift to make room for the rw bit
-  STR   R4, [R7]                                           // store value into I2C1_DR register
+  LDR   R7, =0x40005414                               // load address of I2C1_SR1 register
+  LDR   R8, [R7]                                      // load value inside I2C1_SR1 register
+  TST   R8, #(1<<0)                                   // read the SB bit, if 1, then BEQ
+  BEQ   .I2C_Wait_Start                               // branch if equal
+  LDR   R7, =0x40005410                               // load address of I2C1_DR register
+  LSL   R4, #1                                        // left shift to make room for the rw bit
+  STR   R4, [R7]                                      // store value into I2C1_DR register
 .I2C_Wait_Addr_Flag:
-  LDR   R7, =0x40005414                                    // load address of I2C1_SR1 register
-  LDR   R8, [R7]                                           // load value inside I2C1_SR1 register
-  LDR   R7, =0x40005414                                    // load address of I2C1_SR1 register
-  LDR   R8, [R7]                                           // load value inside I2C1_SR1 register
-  TST   R8, #(1<<1)                                        // read the ADDR bit, if 1, then BEQ
-  BEQ   .I2C_Wait_Addr_Flag                                // branch if equal
-  LDR   R7, =0x40005418                                    // load address of I2C1_SR2 register
-  LDR   R8, [R7]                                           // load value inside I2C1_SR2 register
-  STR   R8, [R7]                                           // store value into I2C1_SR2 register
+  LDR   R7, =0x40005414                               // load address of I2C1_SR1 register
+  LDR   R8, [R7]                                      // load value inside I2C1_SR1 register
+  LDR   R7, =0x40005414                               // load address of I2C1_SR1 register
+  LDR   R8, [R7]                                      // load value inside I2C1_SR1 register
+  TST   R8, #(1<<1)                                   // read the ADDR bit, if 1, then BEQ
+  BEQ   .I2C_Wait_Addr_Flag                           // branch if equal
+  LDR   R7, =0x40005418                               // load address of I2C1_SR2 register
+  LDR   R8, [R7]                                      // load value inside I2C1_SR2 register
+  STR   R8, [R7]                                      // store value into I2C1_SR2 register
 .I2C_Wait_Data_Empty_Send_Mem_Addr:
-  LDR   R7, =0x40005414                                    // load address of I2C1_SR1 register
-  LDR   R8, [R7]                                           // load value inside I2C1_SR1 register
-  TST   R8, #(1<<7)                                        // read the TxE bit, if 0, then BEQ
-  BEQ   .I2C_Wait_Data_Empty_Send_Mem_Addr                 // branch if equal
-  LDR   R7, =0x40005410                                    // load address of I2C1_DR register
-  STR   R5, [R7]                                           // store value into I2C1_DR register
+  LDR   R7, =0x40005414                               // load address of I2C1_SR1 register
+  LDR   R8, [R7]                                      // load value inside I2C1_SR1 register
+  TST   R8, #(1<<7)                                   // read the TxE bit, if 0, then BEQ
+  BEQ   .I2C_Wait_Data_Empty_Send_Mem_Addr            // branch if equal
+  LDR   R7, =0x40005410                               // load address of I2C1_DR register
+  STR   R5, [R7]                                      // store value into I2C1_DR register
 .I2C_Wait_Data_Empty_Send_Data:
-  LDR   R7, =0x40005414                                    // load address of I2C1_SR1 register
-  LDR   R8, [R7]                                           // load value inside I2C1_SR1 register
-  TST   R8, #(1<<7)                                        // read the TxE bit, if 1, then BNE
-  BEQ   .I2C_Wait_Data_Empty_Send_Data                     // branch if equal
+  LDR   R7, =0x40005414                               // load address of I2C1_SR1 register
+  LDR   R8, [R7]                                      // load value inside I2C1_SR1 register
+  TST   R8, #(1<<7)                                   // read the TxE bit, if 1, then BNE
+  BEQ   .I2C_Wait_Data_Empty_Send_Data                // branch if equal
 .I2C_Send_Data:
-  LDR   R7, =0x40005410                                    // load address of I2C1_DR register
-  STR   R6, [R7]                                           // store value into I2C1_DR register
+  LDR   R7, =0x40005410                               // load address of I2C1_DR register
+  STR   R6, [R7]                                      // store value into I2C1_DR register
 .I2C_Wait_Data_Transfer_Finished:
-  LDR   R7, =0x40005414                                    // load address of I2C1_SR1 register
-  LDR   R8, [R7]                                           // load value inside I2C1_SR1 register
-  TST   R8, #(1<<2)                                        // read the BTF bit, if 0, then BEQ
-  BEQ   .I2C_Wait_Data_Transfer_Finished                   // branch if equal
-  LDR   R7, =0x40005400                                    // load address of I2C1_CR1 register
-  LDR   R8, [R7]                                           // load value inside I2C1_CR1 register
-  ORR   R8, #(1<<9)                                        // set the STOP bit
-  ORR   R8, #(1<<0)                                        // set the PE bit
-  STR   R8, [R7]                                           // store value into I2C1_CR1 register
-  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
-  BX    LR                                                 // return to caller
+  LDR   R7, =0x40005414                               // load address of I2C1_SR1 register
+  LDR   R8, [R7]                                      // load value inside I2C1_SR1 register
+  TST   R8, #(1<<2)                                   // read the BTF bit, if 0, then BEQ
+  BEQ   .I2C_Wait_Data_Transfer_Finished              // branch if equal
+  LDR   R7, =0x40005400                               // load address of I2C1_CR1 register
+  LDR   R8, [R7]                                      // load value inside I2C1_CR1 register
+  ORR   R8, #(1<<9)                                   // set the STOP bit
+  ORR   R8, #(1<<0)                                   // set the PE bit
+  STR   R8, [R7]                                      // store value into I2C1_CR1 register
+.I2C_Write_Byte_Pop_Registers:
+  POP   {R4-R12, LR}                                  // pop registers R4-R12, LR from the stack
+  BX    LR                                            // return to caller
 
 /**
  * @brief  Delay for approximately 30 microseconds.
@@ -873,19 +884,21 @@ I2C_Write_Byte:
  * @retval None
  */
 Thirty_Microsecond_Delay:
-  PUSH  {R4-R12, LR}                                       // push registers R4-R12, LR to the stack 
-  MOV   R4, #7                                             // number of loops
+.Thirty_Microsecond_Delay_Push_Registers:
+  PUSH  {R4-R12, LR}                                  // push registers R4-R12, LR to the stack
+Thirty_Microsecond_Delay_Number_Of_Loops:
+  MOV   R4, #7                                        // number of loops
 .Thirty_Microsecond_Delay_Outer_Loop:
-  MOV   R5, #0xFFFF                                        // set initial delay count
+  MOV   R5, #0xFFFF                                   // set initial delay count
 .Thirty_Microsecond_Delay_Inner_Loop:
-  SUB   R5, #1                                             // decrement delay count
-  CMP   R5, #0                                             // check if delay count reached zero
-  BNE   .Thirty_Microsecond_Delay_Inner_Loop               // continue loop if delay count not reached zero
-  SUB   R4, #1                                             // decrement loop counter
-  CMP   R4, #0                                             // check if delay count reached zero
-  BNE   .Thirty_Microsecond_Delay_Outer_Loop               // continue outer loop if more loops to go
-  POP   {R4-R12, LR}                                       // pop registers R4-R12, LR from the stack
-  BX    LR                                                 // return to caller
+  SUB   R5, #1                                        // decrement delay count
+  CMP   R5, #0                                        // check if delay count reached zero
+  BNE   .Thirty_Microsecond_Delay_Inner_Loop          // continue loop if delay count not reached zero
+  SUB   R4, #1                                        // decrement loop counter
+  CMP   R4, #0                                        // check if delay count reached zero
+  BNE   .Thirty_Microsecond_Delay_Outer_Loop          // continue outer loop if more loops to go
+  POP   {R4-R12, LR}                                  // pop registers R4-R12, LR from the stack
+  BX    LR                                            // return to caller
 
 /**
  * @brief  Infinite loop function.
@@ -897,7 +910,7 @@ Thirty_Microsecond_Delay:
  * @retval None
  */
 Loop:
-  B     .                                                  // branch infinite loop
+  B     .                                             // branch infinite loop
 
 
 /**
