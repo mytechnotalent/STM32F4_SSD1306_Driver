@@ -1,11 +1,11 @@
-<img src="https://github.com/mytechnotalent/STM32F4_SSD1306_Driver/blob/main/STM32F4_SSD1306_Driver.png?raw=true">
+<img src="https://github.com/mytechnotalent/STM32F401_SSD1306_Driver/blob/main/STM32F401_SSD1306_Driver.png?raw=true">
 
 ## FREE Reverse Engineering Self-Study Course [HERE](https://github.com/mytechnotalent/Reverse-Engineering-Tutorial)
 
 <br>
 
 # STM32F4 SSD1306 Driver
-An STM32F4, SSD1306 display driver written entirely in Assembler.
+An STM32F401 SSD1306 display driver written entirely in Assembler.
 
 <br>
 
